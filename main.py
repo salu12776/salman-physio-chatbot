@@ -21,6 +21,7 @@ from langchain_qdrant import QdrantVectorStore
 from langchain.chat_models import init_chat_model
 from langchain_classic.memory import ConversationSummaryBufferMemory
 from langchain_classic.chains import ConversationalRetrievalChain
+from langchain_core.prompts import PromptTemplate
 
 # ---------------------------------------------------------------------------
 # 1. Environment variables (Render ke "Environment" tab mein set karni hain)
@@ -61,6 +62,22 @@ llm = init_chat_model("groq:openai/gpt-oss-120b", temperature=0.3, max_tokens=50
 
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
+# Jawab hamesha Roman Urdu ya English mein aaye, Devanagari/Arabic script mein nahi.
+CUSTOM_PROMPT = PromptTemplate(
+    template="""You are a helpful assistant for Salman Physio Care, a physiotherapy clinic.
+Answer the question using only the context below.
+Always reply in Roman Urdu or English, written in the Latin/English alphabet only.
+Never use Devanagari, Arabic, or any other script.
+If you don't know the answer from the context, say so honestly.
+
+Context: {context}
+
+Question: {question}
+
+Answer:""",
+    input_variables=["context", "question"],
+)
+
 # ---------------------------------------------------------------------------
 # 3. Har user (session) ki apni alag memory + chain
 #    NOTE: Ye memory server ki RAM mein hai. Server restart hone par
@@ -94,6 +111,7 @@ def get_or_create_session(session_id: str) -> ConversationalRetrievalChain:
             memory=memory,
             return_source_documents=True,
             output_key="answer",
+            combine_docs_chain_kwargs={"prompt": CUSTOM_PROMPT},
         )
         sessions[session_id] = {"chain": chain, "last_used": now}
     else:
