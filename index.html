@@ -3,31 +3,27 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Salman Physio Care — Physiotherapy Clinic</title>
-<meta name="description" content="Salman Physio Care — back pain, sports injury, post-surgery rehab aur neck/shoulder treatment. Book your session today." />
+<title>Salman Physio Care — Physiotherapy &amp; Rehabilitation</title>
+<meta name="description" content="Salman Physio Care — back pain, sports injury, post-surgery rehab aur neck/shoulder treatment. Guided recovery, lasting results." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@400;500;600&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #F1F6F3;
-    --bg-soft: #E6EFE9;
-    --surface: #FFFFFF;
-    --forest: #0B4F47;
-    --forest-dark: #073630;
-    --forest-tint: #E8F2ED;
-    --amber: #C1852E;
-    --amber-tint: #FBF0DD;
-    --ink: #17211C;
-    --ink-soft: #56635B;
-    --ink-faint: #8A968E;
-    --line: #DCE7DF;
-    --radius-sm: 10px;
-    --radius: 16px;
-    --radius-lg: 26px;
-    --shadow: 0 1px 2px rgba(11,79,71,0.04), 0 8px 24px rgba(11,79,71,0.06);
-    --shadow-lift: 0 4px 10px rgba(11,79,71,0.06), 0 16px 40px rgba(11,79,71,0.10);
-    --container: 1160px;
+    --cream: #F6F2E8;
+    --cream-soft: #EFE9DA;
+    --surface: #FBF8F1;
+    --ink: #262A1F;
+    --ink-soft: #565B4C;
+    --ink-faint: #8B8F7C;
+    --olive: #4B5842;
+    --olive-dark: #333D2C;
+    --sage: #8B9A78;
+    --gold: #B08D4F;
+    --line: #E1DAC6;
+    --radius: 18px;
+    --radius-lg: 30px;
+    --container: 1200px;
   }
 
   * { box-sizing: border-box; }
@@ -35,47 +31,51 @@
 
   body {
     margin: 0;
-    font-family: 'Karla', system-ui, sans-serif;
-    background: var(--bg);
+    font-family: 'Karla', sans-serif;
+    background: var(--cream);
     color: var(--ink);
-    line-height: 1.6;
+    line-height: 1.65;
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
 
-  h1, h2, h3 {
-    font-family: 'Fraunces', Georgia, serif;
-    color: var(--forest-dark);
-    margin: 0;
-    line-height: 1.12;
-    letter-spacing: -0.01em;
-  }
-
+  h1, h2, h3 { margin: 0; color: var(--ink); }
   p { margin: 0; }
   a { color: inherit; }
   img, svg { max-width: 100%; display: block; }
   button { font-family: inherit; }
 
+  .serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+
+  .tracked {
+    font-family: 'Jost', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 500;
+  }
+
   .wrap {
     max-width: var(--container);
     margin: 0 auto;
-    padding: 0 clamp(20px, 4vw, 40px);
+    padding: 0 clamp(20px, 4.5vw, 56px);
   }
 
   .eyebrow {
-    font-size: 0.8rem;
-    color: var(--amber);
-    font-weight: 700;
-    letter-spacing: 0.02em;
+    font-size: 0.75rem;
+    color: var(--olive);
+    font-family: 'Jost', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 500;
   }
 
   header {
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(241, 246, 243, 0.88);
-    backdrop-filter: blur(10px) saturate(1.1);
+    background: rgba(246, 242, 232, 0.9);
+    backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
   }
 
@@ -83,55 +83,67 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 0;
-    gap: 16px;
+    padding: 18px 0;
+    gap: 20px;
   }
 
-  .brand {
-    font-family: 'Fraunces', serif;
+  .brand { text-decoration: none; line-height: 1.1; }
+
+  .brand .name {
+    font-family: 'Jost', sans-serif;
     font-weight: 600;
-    font-size: clamp(1.1rem, 2.4vw, 1.3rem);
-    color: var(--forest-dark);
-    text-decoration: none;
-    white-space: nowrap;
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+
+  .brand .tag {
+    display: block;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-top: 3px;
   }
 
   .nav-links {
     display: flex;
-    gap: clamp(16px, 2.4vw, 30px);
-    font-size: 0.94rem;
-    font-weight: 600;
+    gap: clamp(18px, 2.4vw, 32px);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  .nav-links a {
-    text-decoration: none;
-    color: var(--ink-soft);
-    transition: color 0.15s ease;
-  }
+  .nav-links a { text-decoration: none; color: var(--ink-soft); transition: color 0.15s ease; }
+  .nav-links a:hover { color: var(--olive); }
 
-  .nav-links a:hover { color: var(--forest); }
-
-  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-right { display: flex; align-items: center; gap: 14px; }
 
   .nav-call {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-family: 'Jost', sans-serif;
+    font-weight: 500;
+    font-size: 0.76rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     text-decoration: none;
-    color: white;
-    background: var(--forest-dark);
-    padding: 10px 18px;
+    color: var(--cream);
+    background: var(--olive-dark);
+    padding: 11px 22px;
     border-radius: 999px;
     white-space: nowrap;
     transition: background 0.15s ease;
   }
 
-  .nav-call:hover { background: var(--forest); }
+  .nav-call:hover { background: var(--olive); }
 
   .nav-toggle {
     display: none;
@@ -151,375 +163,407 @@
   .mobile-menu {
     display: none;
     flex-direction: column;
-    gap: 2px;
-    padding: 8px clamp(20px, 4vw, 40px) 18px;
+    padding: 6px clamp(20px, 4.5vw, 56px) 18px;
     border-top: 1px solid var(--line);
+    font-family: 'Jost', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.85rem;
   }
 
   .mobile-menu.open { display: flex; }
-
-  .mobile-menu a {
-    text-decoration: none;
-    color: var(--ink);
-    font-weight: 600;
-    padding: 12px 4px;
-    border-bottom: 1px solid var(--line);
-    font-size: 0.98rem;
-  }
-
+  .mobile-menu a { text-decoration: none; color: var(--ink); padding: 12px 4px; border-bottom: 1px solid var(--line); }
   .mobile-menu a:last-child { border-bottom: none; }
 
-  .hero {
-    padding: clamp(48px, 8vw, 96px) 0 clamp(56px, 8vw, 100px);
-  }
+  .hero { padding: clamp(48px, 7vw, 88px) 0 clamp(40px, 6vw, 70px); }
 
   .hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-    gap: clamp(32px, 5vw, 56px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+    gap: clamp(32px, 5vw, 60px);
     align-items: center;
   }
 
+  .hero-kicker { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+  .hero-kicker span { font-size: 0.72rem; }
+  .hero-kicker .rule { width: 32px; height: 1px; background: var(--ink-faint); }
+
   .hero h1 {
-    font-size: clamp(2rem, 4.4vw, 3.4rem);
-    max-width: 14ch;
-    margin-top: 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(3rem, 7vw, 5.4rem);
+    line-height: 0.98;
+    letter-spacing: -0.01em;
   }
 
-  .hero .lede {
-    margin-top: 20px;
-    font-size: clamp(1rem, 1.6vw, 1.15rem);
-    color: var(--ink-soft);
-    max-width: 46ch;
-  }
+  .hero h1 .accent { color: var(--olive); font-style: italic; font-weight: 400; }
 
-  .hero-ctas {
-    display: flex;
-    gap: 12px;
-    margin-top: 30px;
-    flex-wrap: wrap;
-  }
+  .hero-divider { display: flex; align-items: center; gap: 14px; margin: 26px 0 18px; }
+  .hero-divider .rule { width: 46px; height: 1px; background: var(--gold); }
+  .hero-divider span { color: var(--gold); font-size: 1rem; }
+
+  .hero .lede { font-size: clamp(1rem, 1.4vw, 1.1rem); color: var(--ink-soft); max-width: 40ch; }
+
+  .hero-ctas { margin-top: 32px; }
 
   .btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 14px 24px;
+    gap: 10px;
+    padding: 15px 28px;
     border-radius: 999px;
-    font-weight: 700;
-    font-size: 0.95rem;
+    font-family: 'Jost', sans-serif;
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     text-decoration: none;
     cursor: pointer;
     border: none;
-    transition: transform 0.12s ease, background 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.12s ease, background 0.15s ease;
     white-space: nowrap;
   }
 
   .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--olive-dark); color: var(--cream); }
+  .btn-primary:hover { background: var(--olive); }
+  .btn-outline { background: transparent; color: var(--ink); border: 1.3px solid var(--ink); }
+  .btn-outline:hover { background: var(--ink); color: var(--cream); }
+  .btn-light { background: var(--cream); color: var(--olive-dark); }
+  .btn-light:hover { background: white; }
 
-  .btn-primary {
-    background: var(--forest-dark);
-    color: white;
-    box-shadow: var(--shadow);
+  .hero-art {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    background: linear-gradient(160deg, #DDE3D0 0%, #C7D0B6 45%, #A8B594 100%);
   }
 
-  .btn-primary:hover { background: var(--forest); box-shadow: var(--shadow-lift); }
+  .hero-art svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-  .btn-ghost {
-    background: var(--surface);
-    color: var(--forest-dark);
-    border: 1.5px solid var(--line);
-  }
-
-  .btn-ghost:hover { border-color: var(--forest-dark); }
-
-  .hero-stats {
+  .hero-badge {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    background: rgba(246,242,232,0.92);
+    backdrop-filter: blur(6px);
+    border-radius: 14px;
+    padding: 14px 20px;
     display: flex;
-    flex-wrap: wrap;
-    gap: clamp(20px, 4vw, 36px);
-    margin-top: 40px;
-    padding-top: 26px;
-    border-top: 1px solid var(--line);
+    gap: 16px;
   }
 
-  .hero-stats div strong {
+  .hero-badge div strong {
     display: block;
-    font-family: 'Fraunces', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-size: 1.5rem;
-    color: var(--forest-dark);
+    color: var(--olive-dark);
     font-weight: 600;
+    line-height: 1;
   }
 
-  .hero-stats div span {
-    font-size: 0.82rem;
+  .hero-badge div span {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     color: var(--ink-faint);
   }
 
-  .hero-art {
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    padding: clamp(24px, 4vw, 40px);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow);
-    aspect-ratio: 1 / 1;
+  section { padding: clamp(56px, 8vw, 96px) 0; }
+
+  .center-head { text-align: center; max-width: 60ch; margin: 0 auto clamp(36px, 5vw, 56px); }
+  .center-head .eyebrow { display: block; margin-bottom: 14px; }
+  .center-head h2 { font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: clamp(1.8rem, 3.6vw, 2.6rem); }
+
+  .highlight-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .highlight-card { text-align: left; }
+
+  .highlight-img {
+    border-radius: var(--radius);
+    aspect-ratio: 4 / 3.2;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .highlight-img svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .highlight-meta { display: flex; align-items: center; gap: 12px; }
+
+  .highlight-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--olive-dark);
+    color: var(--cream);
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.05rem;
   }
 
-  section { padding: clamp(56px, 8vw, 88px) 0; }
+  .highlight-card h3 { font-family: 'Jost', sans-serif; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.03em; }
+  .highlight-card p.desc { font-size: 0.88rem; color: var(--ink-soft); margin-top: 3px; }
 
-  .section-head {
-    max-width: 56ch;
-    margin-bottom: clamp(32px, 5vw, 48px);
-  }
+  .treatments { background: var(--cream-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .treatment-list { display: flex; flex-direction: column; }
 
-  .section-head .eyebrow { display: block; margin-bottom: 10px; }
-
-  .section-head h2 {
-    font-size: clamp(1.6rem, 3.2vw, 2.2rem);
-  }
-
-  .section-head p {
-    margin-top: 14px;
-    color: var(--ink-soft);
-    font-size: 1rem;
-  }
-
-  .services { background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-
-  .service-grid {
+  .treatment-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 18px;
+    grid-template-columns: 2fr 1fr 1fr;
+    align-items: center;
+    gap: 20px;
+    padding: 26px 0;
+    border-bottom: 1px solid var(--line);
   }
 
-  .service-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: clamp(22px, 3vw, 28px);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+  .treatment-row:last-child { border-bottom: none; }
+  .treatment-row h3 { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 1.4rem; }
+  .treatment-row p.desc { font-size: 0.9rem; color: var(--ink-soft); margin-top: 4px; }
 
-  .service-card h3 { font-size: 1.15rem; font-weight: 600; }
-
-  .service-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 16px;
-    font-size: 0.85rem;
+  .treatment-duration {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--ink-faint);
   }
 
-  .service-fee {
-    font-family: 'Fraunces', serif;
+  .treatment-fee {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
     font-weight: 600;
-    color: var(--forest-dark);
+    color: var(--olive-dark);
+    text-align: right;
   }
 
-  .service-card p.desc {
-    font-size: 0.94rem;
-    color: var(--ink-soft);
-    flex: 1;
+  .treatment-badge {
+    display: inline-block;
+    margin-top: 6px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
   }
 
-  .badge {
-    align-self: flex-start;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    color: var(--amber);
-    background: var(--amber-tint);
-    padding: 4px 11px;
-    border-radius: 999px;
-  }
-
-  .package-row {
+  .cta-banner {
+    background: var(--olive-dark);
+    border-radius: var(--radius-lg);
+    margin: 0 auto;
+    max-width: var(--container);
+    padding: clamp(16px, 3vw, 28px);
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 18px;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    overflow: hidden;
   }
+
+  .cta-text { padding: clamp(24px, 4vw, 44px); color: #EDEFE4; }
+
+  .cta-text h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(1.9rem, 3.4vw, 2.5rem);
+    color: white;
+    line-height: 1.1;
+  }
+
+  .cta-text .eyebrow { color: #B7C4A2; }
+  .cta-text p.lede { margin-top: 16px; color: #C6D0B8; max-width: 40ch; font-size: 0.95rem; }
+  .cta-text .hero-ctas { margin-top: 26px; }
+
+  .cta-art {
+    aspect-ratio: 1 / 1.05;
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(160deg, #5C6A50 0%, #47543C 100%);
+  }
+
+  .cta-art svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  .package-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
 
   .package-card {
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: clamp(24px, 3vw, 32px);
+    padding: clamp(26px, 3vw, 34px);
     background: var(--surface);
-    box-shadow: var(--shadow);
   }
 
-  .package-card.highlight {
-    border: 1.5px solid var(--forest-dark);
-    background: linear-gradient(175deg, var(--forest-tint) 0%, var(--surface) 55%);
-    position: relative;
-  }
-
-  .package-card .eyebrow { color: var(--ink-faint); }
-  .package-card.highlight .eyebrow { color: var(--forest); }
+  .package-card.highlight { border: 1.4px solid var(--olive); background: linear-gradient(175deg, #EFF2E7 0%, var(--surface) 60%); }
 
   .package-price {
-    font-family: 'Fraunces', serif;
-    font-size: clamp(1.7rem, 3vw, 2.1rem);
-    color: var(--forest-dark);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 3vw, 2.5rem);
     font-weight: 600;
-    margin: 10px 0 6px;
+    color: var(--olive-dark);
+    margin: 12px 0 8px;
   }
 
   .package-save {
     display: inline-block;
-    color: var(--amber);
-    font-weight: 700;
-    font-size: 0.88rem;
-    background: var(--amber-tint);
-    padding: 3px 12px;
+    color: var(--gold);
+    font-family: 'Jost', sans-serif;
+    font-weight: 500;
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid var(--gold);
+    padding: 4px 12px;
     border-radius: 999px;
   }
 
   .home-visit-note {
-    margin-top: 22px;
-    padding: 18px 22px;
-    background: var(--bg-soft);
+    margin-top: 24px;
+    padding: 18px 24px;
+    background: var(--cream-soft);
     border-radius: var(--radius);
     font-size: 0.94rem;
     color: var(--ink-soft);
     border: 1px dashed var(--line);
   }
 
-  .staff-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 18px;
-  }
+  .staff-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
 
   .staff-card {
     display: flex;
     gap: 18px;
     align-items: flex-start;
-    padding: clamp(22px, 3vw, 26px);
+    padding: clamp(24px, 3vw, 28px);
     background: var(--surface);
     border-radius: var(--radius);
     border: 1px solid var(--line);
-    box-shadow: var(--shadow);
   }
 
   .avatar {
     flex-shrink: 0;
-    width: 52px;
-    height: 52px;
+    width: 54px;
+    height: 54px;
     border-radius: 50%;
-    background: var(--forest-dark);
-    color: white;
+    background: var(--olive-dark);
+    color: var(--cream);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Fraunces', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-weight: 600;
-    font-size: 1.05rem;
+    font-size: 1.15rem;
   }
 
-  .staff-card h3 { font-size: 1.05rem; }
+  .staff-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 600; }
 
   .staff-role {
-    color: var(--amber);
-    font-size: 0.84rem;
-    font-weight: 700;
-    margin-top: 3px;
+    font-family: 'Jost', sans-serif;
+    color: var(--gold);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-top: 4px;
   }
 
-  .staff-card p.desc {
-    margin-top: 8px;
-    font-size: 0.92rem;
-    color: var(--ink-soft);
-  }
+  .staff-card p.desc { margin-top: 8px; font-size: 0.92rem; color: var(--ink-soft); }
 
-  .contact {
-    background: var(--forest-dark);
-    color: #E8F2ED;
-    border-radius: var(--radius-lg);
-    margin: 0 auto;
-    max-width: var(--container);
-    padding: clamp(32px, 5vw, 56px);
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: clamp(28px, 4vw, 48px);
-  }
-
-  .contact h2 { color: white; font-size: clamp(1.5rem, 2.8vw, 1.85rem); }
-  .contact .eyebrow { color: #8FCBB4; }
-
-  .info-list { margin-top: 22px; }
+  .contact-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 5vw, 56px); }
+  .info-list { margin-top: 24px; }
 
   .info-row {
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    padding: 13px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.14);
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
     font-size: 0.92rem;
   }
 
   .info-row:last-child { border-bottom: none; }
-  .info-row span:first-child { color: #A9CFBF; }
-  .info-row span:last-child { font-weight: 700; text-align: right; }
+  .info-row span:first-child { font-family: 'Jost', sans-serif; font-size: 0.76rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); }
+  .info-row span:last-child { font-weight: 600; text-align: right; }
 
-  .contact-cta {
+  .contact-cta { display: flex; flex-direction: column; gap: 14px; align-self: start; }
+  .policy-note { margin-top: 20px; font-size: 0.85rem; color: var(--ink-faint); line-height: 1.7; }
+
+  footer { border-top: 1px solid var(--line); padding: 36px 0 110px; }
+
+  .footer-inner {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-self: start;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
   }
 
-  .contact .btn-primary {
-    background: var(--amber);
-    color: #2A1B05;
-  }
-
-  .contact .btn-primary:hover { background: #D89A45; }
-
-  .contact .btn-ghost {
-    background: transparent;
-    border-color: rgba(255,255,255,0.35);
-    color: white;
-  }
-
-  .contact .btn-ghost:hover { border-color: white; }
-
-  .policy-note {
-    margin-top: 18px;
-    font-size: 0.84rem;
-    color: #9BBFB0;
-    line-height: 1.6;
-  }
-
-  footer {
-    padding: 30px 0 100px;
-    text-align: center;
-    font-size: 0.84rem;
+  .footer-brand {
+    font-family: 'Jost', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     color: var(--ink-faint);
+  }
+
+  .footer-links { display: flex; gap: 18px; }
+
+  .footer-links a {
+    text-decoration: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .footer-links a:hover { border-color: var(--olive); color: var(--olive); }
+
+  @media (max-width: 1024px) {
+    :root { --container: 92vw; }
   }
 
   @media (max-width: 980px) {
     .hero-grid { grid-template-columns: 1fr; }
-    .hero-art { order: -1; max-width: 340px; margin: 0 auto; }
+    .hero-art { order: -1; max-width: 420px; margin: 0 auto; aspect-ratio: 4/3; }
+    .highlight-grid { grid-template-columns: 1fr 1fr; }
+    .cta-banner { grid-template-columns: 1fr; }
+    .cta-art { display: none; }
+    .package-row, .staff-grid, .contact-wrap { grid-template-columns: 1fr; }
+    .treatment-row { grid-template-columns: 1fr; row-gap: 6px; }
+    .treatment-fee { text-align: left; }
   }
 
   @media (max-width: 760px) {
     .nav-links, .nav-call { display: none; }
     .nav-toggle { display: flex; }
-    .contact { grid-template-columns: 1fr; padding: 30px 24px; border-radius: 20px; }
+    .highlight-grid { grid-template-columns: 1fr; }
+    .cta-text { padding: 28px 24px; }
   }
 
-  @media (min-width: 761px) {
-    .mobile-menu { display: none !important; }
+  @media (min-width: 761px) { .mobile-menu { display: none !important; } }
+
+  @media (max-width: 640px) {
+    .hero-kicker { flex-wrap: wrap; row-gap: 8px; }
+    .hero h1 { font-size: clamp(2.4rem, 11vw, 3.4rem); }
+    .package-card, .staff-card { padding: 22px; }
+    section { padding: clamp(44px, 10vw, 64px) 0; }
   }
 
   @media (max-width: 480px) {
-    .hero-stats { gap: 22px; }
     .wrap { padding: 0 18px; }
+    .hero-badge { position: static; margin-top: 14px; display: inline-flex; flex-wrap: wrap; row-gap: 10px; }
+    .hero-ctas .btn, .contact-cta .btn { width: 100%; justify-content: center; }
+    .footer-inner { flex-direction: column; text-align: center; }
+  }
+
+  @media (max-width: 360px) {
+    .brand .tag { display: none; }
+    .highlight-icon { width: 32px; height: 32px; font-size: 0.9rem; }
   }
 </style>
 </head>
@@ -527,98 +571,195 @@
 
 <header>
   <div class="wrap nav">
-    <a href="#" class="brand">Salman Physio Care</a>
+    <a href="#" class="brand">
+      <span class="name">Salman Physio Care</span>
+      <span class="tag">Physiotherapy &amp; Rehabilitation</span>
+    </a>
     <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
       <li><a href="#services">Services</a></li>
       <li><a href="#packages">Packages</a></li>
       <li><a href="#staff">Team</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="nav-right">
-      <a href="tel:03259874794" class="nav-call">📞 0325-9874794</a>
+      <a href="tel:03259874794" class="nav-call">Book a Session</a>
       <button class="nav-toggle" id="navToggle" aria-label="Menu kholein">
-        <svg id="iconMenu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
     </div>
   </div>
   <nav class="mobile-menu" id="mobileMenu">
+    <a href="#home">Home</a>
     <a href="#services">Services</a>
     <a href="#packages">Packages</a>
     <a href="#staff">Team</a>
     <a href="#contact">Contact</a>
-    <a href="tel:03259874794">📞 Call — 0325-9874794</a>
+    <a href="tel:03259874794">Call 0325-9874794</a>
   </nav>
 </header>
 
-<section class="hero">
+<section class="hero" id="home">
   <div class="wrap hero-grid">
     <div>
-      <span class="eyebrow">PHYSIOTHERAPY CLINIC</span>
-      <h1>Movement is medicine — let's get you back to it.</h1>
-      <p class="lede">Back pain, sports injuries, post-surgery recovery, ya neck aur shoulder ki takleef — Salman Physio Care mein har ilaj ek qualified physiotherapist ki nigrani mein hota hai.</p>
-      <div class="hero-ctas">
-        <a href="tel:03259874794" class="btn btn-primary">Book a session — 0325-9874794</a>
-        <a href="#services" class="btn btn-ghost">View services</a>
+      <div class="hero-kicker">
+        <span class="tracked" style="color:var(--ink-faint);">Guided Recovery</span>
+        <span class="rule"></span>
+        <span class="tracked" style="color:var(--ink-faint);">Lasting Results</span>
       </div>
-      <div class="hero-stats">
-        <div><strong>10+</strong><span>Years experience</span></div>
-        <div><strong>4</strong><span>Treatment types</span></div>
-        <div><strong>Mon–Sat</strong><span>10 AM – 8 PM</span></div>
+      <h1>Move.<br>Recover.<br><span class="accent">Return.</span></h1>
+      <div class="hero-divider"><span>❦</span><span class="rule"></span></div>
+      <p class="lede">Back pain, sports injuries, post-surgery recovery ya neck/shoulder ki takleef — har ilaj ek qualified physiotherapist ki nigrani mein, aapki apni raftaar par.</p>
+      <div class="hero-ctas">
+        <a href="tel:03259874794" class="btn btn-primary">Book a Session →</a>
       </div>
     </div>
     <div class="hero-art">
-      <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;">
-        <circle cx="150" cy="150" r="140" fill="#E6EFE9"/>
-        <path d="M60 190 Q 100 120 150 150 T 240 110" stroke="#0B4F47" stroke-width="6" fill="none" stroke-linecap="round"/>
-        <circle cx="150" cy="150" r="14" fill="#C1852E"/>
-        <circle cx="60" cy="190" r="8" fill="#0B4F47"/>
-        <circle cx="240" cy="110" r="8" fill="#0B4F47"/>
-        <path d="M100 220 q50 -30 100 0" stroke="#9BBFB0" stroke-width="3" fill="none" stroke-dasharray="2 8" stroke-linecap="round"/>
+      <svg viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#DDE3D0"/>
+            <stop offset="100%" stop-color="#A8B594"/>
+          </linearGradient>
+        </defs>
+        <rect width="400" height="500" fill="url(#g1)"/>
+        <circle cx="320" cy="80" r="120" fill="#EFE9DA" opacity="0.35"/>
+        <path d="M60 380 Q 120 260 200 300 T 340 200" stroke="#4B5842" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.55"/>
+        <circle cx="200" cy="300" r="10" fill="#B08D4F"/>
+        <circle cx="60" cy="380" r="7" fill="#333D2C"/>
+        <circle cx="340" cy="200" r="7" fill="#333D2C"/>
+        <path d="M90 430 q60 -34 120 0 t120 0" stroke="#F6F2E8" stroke-width="2.5" fill="none" stroke-dasharray="1 10" stroke-linecap="round" opacity="0.7"/>
       </svg>
+      <div class="hero-badge">
+        <div><strong>10+</strong><span>Years Exp.</span></div>
+        <div><strong>4</strong><span>Treatments</span></div>
+        <div><strong>Mon–Sat</strong><span>10–8</span></div>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="services" id="services">
+<section id="services">
   <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">TREATMENTS</span>
-      <h2>Chaar treatments, ek maqsad: pain se aazadi.</h2>
-      <p>Har session ka duration aur fee neeche di hui hai, taake aap pehle se andaza laga sakein.</p>
+    <div class="center-head">
+      <span class="eyebrow">Practice. Recover. Return.</span>
+      <h2>Care built around your body.</h2>
     </div>
-    <div class="service-grid">
-      <div class="service-card">
-        <h3>Back Pain Treatment</h3>
-        <div class="service-meta">
-          <span>30–45 min</span>
-          <span class="service-fee">PKR 2,000 / session</span>
+    <div class="highlight-grid">
+      <div class="highlight-card">
+        <div class="highlight-img">
+          <svg viewBox="0 0 300 240" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="240" fill="#E7E1CE"/>
+            <path d="M40 190 Q 100 100 150 140 T 260 80" stroke="#4B5842" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.6"/>
+            <circle cx="150" cy="140" r="9" fill="#B08D4F"/>
+          </svg>
         </div>
-        <p class="desc">Manual therapy, stretching exercises aur posture correction. Chronic aur acute lower back pain dono ke liye suitable.</p>
+        <div class="highlight-meta">
+          <div class="highlight-icon">🦴</div>
+          <div>
+            <h3>Back Pain Treatment</h3>
+            <p class="desc">Manual therapy &amp; posture correction.</p>
+          </div>
+        </div>
       </div>
-      <div class="service-card">
-        <h3>Post-Surgery Rehabilitation</h3>
-        <div class="service-meta">
-          <span>45–60 min</span>
-          <span class="service-fee">PKR 2,500 / session</span>
+      <div class="highlight-card">
+        <div class="highlight-img">
+          <svg viewBox="0 0 300 240" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="240" fill="#D9DFC9"/>
+            <circle cx="150" cy="120" r="70" fill="none" stroke="#4B5842" stroke-width="4" opacity="0.5"/>
+            <circle cx="150" cy="120" r="8" fill="#B08D4F"/>
+          </svg>
         </div>
-        <p class="desc">Orthopedic ya spinal surgery ke baad gradual mobility recovery par focus.</p>
-        <span class="badge">REFERRAL REQUIRED</span>
+        <div class="highlight-meta">
+          <div class="highlight-icon">🏃</div>
+          <div>
+            <h3>Sports Injury</h3>
+            <p class="desc">Strengthening &amp; taping support.</p>
+          </div>
+        </div>
       </div>
-      <div class="service-card">
-        <h3>Sports Injury Treatment</h3>
-        <div class="service-meta">
-          <span>30 min</span>
-          <span class="service-fee">PKR 1,800 / session</span>
+      <div class="highlight-card">
+        <div class="highlight-img">
+          <svg viewBox="0 0 300 240" xmlns="http://www.w3.org/2000/svg">
+            <rect width="300" height="240" fill="#C7D0B6"/>
+            <path d="M60 60 L 240 180 M 240 60 L 60 180" stroke="#333D2C" stroke-width="3" opacity="0.3"/>
+            <circle cx="150" cy="120" r="30" fill="#EFE9DA" opacity="0.7"/>
+          </svg>
         </div>
-        <p class="desc">Muscle strains, ligament injuries aur joint pain ke liye taping aur strengthening exercises.</p>
+        <div class="highlight-meta">
+          <div class="highlight-icon">🩺</div>
+          <div>
+            <h3>Post-Surgery Rehab</h3>
+            <p class="desc">Gradual, guided mobility recovery.</p>
+          </div>
+        </div>
       </div>
-      <div class="service-card">
-        <h3>Neck &amp; Shoulder Pain</h3>
-        <div class="service-meta">
-          <span>30 min</span>
-          <span class="service-fee">PKR 1,500 / session</span>
+    </div>
+  </div>
+</section>
+
+<section class="treatments">
+  <div class="wrap">
+    <div class="center-head">
+      <span class="eyebrow">All Treatments</span>
+      <h2>Fees &amp; session details.</h2>
+    </div>
+    <div class="treatment-list">
+      <div class="treatment-row">
+        <div>
+          <h3>Back Pain Treatment</h3>
+          <p class="desc">Chronic aur acute lower back pain, dono ke liye suitable.</p>
         </div>
-        <p class="desc">Desk-job stiffness, cervical spondylosis aur frozen shoulder ke liye targeted relief.</p>
+        <div class="treatment-duration">30–45 min</div>
+        <div class="treatment-fee">PKR 2,000</div>
+      </div>
+      <div class="treatment-row">
+        <div>
+          <h3>Post-Surgery Rehabilitation</h3>
+          <p class="desc">Orthopedic ya spinal surgery ke baad mobility recovery.</p>
+          <span class="treatment-badge">Referral Required</span>
+        </div>
+        <div class="treatment-duration">45–60 min</div>
+        <div class="treatment-fee">PKR 2,500</div>
+      </div>
+      <div class="treatment-row">
+        <div>
+          <h3>Sports Injury Treatment</h3>
+          <p class="desc">Muscle strains, ligament injuries aur joint pain.</p>
+        </div>
+        <div class="treatment-duration">30 min</div>
+        <div class="treatment-fee">PKR 1,800</div>
+      </div>
+      <div class="treatment-row">
+        <div>
+          <h3>Neck &amp; Shoulder Pain</h3>
+          <p class="desc">Desk-job stiffness, cervical spondylosis, frozen shoulder.</p>
+        </div>
+        <div class="treatment-duration">30 min</div>
+        <div class="treatment-fee">PKR 1,500</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-banner">
+      <div class="cta-text">
+        <span class="eyebrow">Your Body. Your Pace.</span>
+        <h2 class="serif" style="margin-top:14px;">Your pain.<br>Your recovery.<br>Your journey.</h2>
+        <p class="lede">Aapko perfect hone ki zaroorat nahi — bas shuru karne ki zaroorat hai. Ek call, aur aapki recovery ka safar shuru.</p>
+        <div class="hero-ctas">
+          <a href="tel:03259874794" class="btn btn-light">Book a Session</a>
+        </div>
+      </div>
+      <div class="cta-art">
+        <svg viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg">
+          <path d="M40 340 Q 120 200 200 250 T 360 120" stroke="#EDEFE4" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.5"/>
+          <circle cx="200" cy="250" r="9" fill="#B08D4F"/>
+          <circle cx="360" cy="120" r="70" fill="#5C6A50" opacity="0.6"/>
+          <circle cx="70" cy="90" r="40" fill="#5C6A50" opacity="0.4"/>
+        </svg>
       </div>
     </div>
   </div>
@@ -626,19 +767,18 @@
 
 <section id="packages">
   <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">PACKAGES</span>
+    <div class="center-head">
+      <span class="eyebrow">Packages</span>
       <h2>Zyada sessions, zyada bachat.</h2>
-      <p>Agar aapko regular sessions ki zaroorat hai, to package lena individual sessions se sasta parta hai.</p>
     </div>
     <div class="package-row">
       <div class="package-card">
-        <span class="eyebrow">10-SESSION PACKAGE</span>
+        <span class="eyebrow">10-Session Package</span>
         <div class="package-price">PKR 15,000</div>
         <span class="package-save">Save PKR 5,000</span>
       </div>
       <div class="package-card highlight">
-        <span class="eyebrow">20-SESSION PACKAGE</span>
+        <span class="eyebrow">20-Session Package</span>
         <div class="package-price">PKR 28,000</div>
         <span class="package-save">Save PKR 8,000</span>
       </div>
@@ -649,11 +789,11 @@
   </div>
 </section>
 
-<section class="services" id="staff">
+<section id="staff">
   <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">OUR TEAM</span>
-      <h2>Qualified physiotherapists, personal attention.</h2>
+    <div class="center-head">
+      <span class="eyebrow">Our Team</span>
+      <h2>Qualified physiotherapists.</h2>
     </div>
     <div class="staff-grid">
       <div class="staff-card">
@@ -678,10 +818,12 @@
 
 <section id="contact">
   <div class="wrap">
-    <div class="contact">
+    <div class="center-head">
+      <span class="eyebrow">Get In Touch</span>
+      <h2>Apni booking confirm karayein.</h2>
+    </div>
+    <div class="contact-wrap">
       <div>
-        <span class="eyebrow">GET IN TOUCH</span>
-        <h2>Apni booking confirm karayein.</h2>
         <div class="info-list">
           <div class="info-row"><span>Timings</span><span>Mon – Sat, 10 AM – 8 PM</span></div>
           <div class="info-row"><span>Sunday</span><span>Closed</span></div>
@@ -692,14 +834,20 @@
       </div>
       <div class="contact-cta">
         <a href="tel:03259874794" class="btn btn-primary">Call to Book — 0325-9874794</a>
-        <a href="https://wa.me/923259874794" class="btn btn-ghost">Message on WhatsApp</a>
+        <a href="https://wa.me/923259874794" class="btn btn-outline">Message on WhatsApp</a>
       </div>
     </div>
   </div>
 </section>
 
 <footer>
-  © <span id="year"></span> Salman Physio Care. Sab rights reserved.
+  <div class="wrap footer-inner">
+    <span class="footer-brand">© <span id="year"></span> Salman Physio Care — All Rights Reserved</span>
+    <div class="footer-links">
+      <a href="tel:03259874794" aria-label="Call">📞</a>
+      <a href="https://wa.me/923259874794" aria-label="WhatsApp">💬</a>
+    </div>
+  </div>
 </footer>
 
 <!-- ============================================================
@@ -708,7 +856,6 @@
      ============================================================ -->
 <div id="spc-chat-widget">
   <button id="spc-chat-toggle" aria-label="Chat kholein">💬</button>
-
   <div id="spc-chat-window">
     <div id="spc-chat-header">
       <span>Salman Physio Care</span>
@@ -723,119 +870,36 @@
 </div>
 
 <style>
-  #spc-chat-widget {
-    position: fixed;
-    bottom: clamp(16px, 3vw, 24px);
-    right: clamp(16px, 3vw, 24px);
-    z-index: 9999;
-    font-family: 'Karla', sans-serif;
-  }
-
+  #spc-chat-widget { position: fixed; bottom: clamp(16px,3vw,24px); right: clamp(16px,3vw,24px); z-index: 9999; font-family: 'Karla', sans-serif; }
   #spc-chat-toggle {
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    background: var(--forest-dark, #0B4F47);
-    color: white;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    box-shadow: 0 6px 20px rgba(7,54,48,0.35);
+    width: 58px; height: 58px; border-radius: 50%;
+    background: var(--olive-dark, #333D2C); color: #F6F2E8; border: none;
+    font-size: 24px; cursor: pointer; box-shadow: 0 6px 20px rgba(51,61,44,0.35);
     transition: transform 0.15s ease;
   }
-
   #spc-chat-toggle:hover { transform: scale(1.05); }
-
   #spc-chat-window {
-    display: none;
-    flex-direction: column;
-    position: fixed;
-    bottom: 88px;
-    right: clamp(12px, 3vw, 24px);
-    width: min(360px, calc(100vw - 32px));
-    height: min(480px, 70vh);
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(7,54,48,0.28);
-    overflow: hidden;
-    border: 1px solid #E6EFE9;
+    display: none; flex-direction: column; position: fixed;
+    bottom: 88px; right: clamp(12px,3vw,24px);
+    width: min(360px, calc(100vw - 32px)); height: min(480px, 70vh);
+    background: #FBF8F1; border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(51,61,44,0.28); overflow: hidden;
+    border: 1px solid #E1DAC6;
   }
-
   #spc-chat-window.open { display: flex; }
-
   #spc-chat-header {
-    background: var(--forest-dark, #0B4F47);
-    color: white;
-    padding: 15px 18px;
-    font-weight: 700;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: 'Fraunces', serif;
+    background: var(--olive-dark, #333D2C); color: #F6F2E8; padding: 15px 18px;
+    font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+    font-family: 'Cormorant Garamond', serif; font-size: 1.1rem;
   }
-
-  #spc-chat-header button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    opacity: 0.85;
-  }
-
-  #spc-chat-messages {
-    flex: 1;
-    padding: 14px;
-    overflow-y: auto;
-    background: #FAFCFB;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .spc-msg {
-    max-width: 82%;
-    padding: 10px 14px;
-    border-radius: 14px;
-    font-size: 14px;
-    line-height: 1.45;
-    white-space: pre-wrap;
-  }
-
-  .spc-msg.user {
-    align-self: flex-end;
-    background: var(--forest-dark, #0B4F47);
-    color: white;
-    border-bottom-right-radius: 4px;
-  }
-
-  .spc-msg.bot {
-    align-self: flex-start;
-    background: #EEF3F0;
-    color: #17211C;
-    border-bottom-left-radius: 4px;
-  }
-
-  #spc-chat-form { display: flex; border-top: 1px solid #E6EFE9; }
-
-  #spc-chat-input {
-    flex: 1;
-    border: none;
-    padding: 13px 14px;
-    font-size: 14px;
-    outline: none;
-    min-width: 0;
-  }
-
-  #spc-chat-form button {
-    background: var(--forest-dark, #0B4F47);
-    color: white;
-    border: none;
-    padding: 0 18px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-  }
+  #spc-chat-header button { background: none; border: none; color: #F6F2E8; font-size: 16px; cursor: pointer; opacity: 0.85; }
+  #spc-chat-messages { flex: 1; padding: 14px; overflow-y: auto; background: #F6F2E8; display: flex; flex-direction: column; gap: 10px; }
+  .spc-msg { max-width: 82%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.45; white-space: pre-wrap; }
+  .spc-msg.user { align-self: flex-end; background: var(--olive-dark, #333D2C); color: #F6F2E8; border-bottom-right-radius: 4px; }
+  .spc-msg.bot { align-self: flex-start; background: #EFE9DA; color: #262A1F; border-bottom-left-radius: 4px; }
+  #spc-chat-form { display: flex; border-top: 1px solid #E1DAC6; }
+  #spc-chat-input { flex: 1; border: none; padding: 13px 14px; font-size: 14px; outline: none; min-width: 0; background: #FBF8F1; }
+  #spc-chat-form button { background: var(--olive-dark, #333D2C); color: #F6F2E8; border: none; padding: 0 18px; cursor: pointer; font-size: 14px; font-weight: 600; }
 </style>
 
 <script>
@@ -843,23 +907,17 @@
 
   const navToggle = document.getElementById('navToggle');
   const mobileMenu = document.getElementById('mobileMenu');
-  navToggle.addEventListener('click', () => {
-    mobileMenu.classList.toggle('open');
-  });
-  mobileMenu.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => mobileMenu.classList.remove('open'));
-  });
+  navToggle.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
 
   (function () {
     const API_URL = "https://salman-physio-chatbot.onrender.com";
-
     const toggleBtn = document.getElementById("spc-chat-toggle");
     const closeBtn = document.getElementById("spc-chat-close");
     const chatWindow = document.getElementById("spc-chat-window");
     const messagesEl = document.getElementById("spc-chat-messages");
     const form = document.getElementById("spc-chat-form");
     const input = document.getElementById("spc-chat-input");
-
     let sessionId = localStorage.getItem("spc_session_id") || null;
 
     function addMessage(text, sender) {
@@ -877,37 +935,29 @@
       }
     });
 
-    closeBtn.addEventListener("click", () => {
-      chatWindow.classList.remove("open");
-    });
+    closeBtn.addEventListener("click", () => chatWindow.classList.remove("open"));
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const message = input.value.trim();
       if (!message) return;
-
       addMessage(message, "user");
       input.value = "";
-
       const typingEl = document.createElement("div");
       typingEl.className = "spc-msg bot";
       typingEl.textContent = "...";
       messagesEl.appendChild(typingEl);
       messagesEl.scrollTop = messagesEl.scrollHeight;
-
       try {
         const res = await fetch(API_URL + "/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message, session_id: sessionId }),
         });
-
         if (!res.ok) throw new Error("Server error");
-
         const data = await res.json();
         sessionId = data.session_id;
         localStorage.setItem("spc_session_id", sessionId);
-
         typingEl.textContent = data.answer;
       } catch (err) {
         typingEl.textContent = "Maazrat, abhi jawab nahi mil saka. Baad mein dobara koshish karein.";
