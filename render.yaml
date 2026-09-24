@@ -21,4 +21,4 @@ services:
       - key: QDRANT_COLLECTION
         value: salman_physio_docs
       - key: ALLOWED_ORIGINS
-        value: "*"
+        value: "https://salu12776.github.io"
