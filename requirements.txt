@@ -10,3 +10,6 @@ langchain_classic
 langchain_groq
 transformers
 slowapi
+gspread
+tzdata
+langgraph
