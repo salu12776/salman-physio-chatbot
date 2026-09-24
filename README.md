@@ -102,3 +102,4 @@ uvicorn main:app --reload
 ## 👤 Author
 
 **Salman** — [GitHub](https://github.com/salu12776)
+https://docs.google.com/spreadsheets/d/1dek9Rr9kZs3F-ly5oakLij8ZjkTsumD-qZ5Cwz90RgE/edit?gid=0#gid=0
