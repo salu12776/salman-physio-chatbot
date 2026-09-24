@@ -78,7 +78,7 @@ PKT = ZoneInfo("Asia/Karachi")
 CLINIC_PHONE = "0325-9874794"
 OPEN_HOUR, CLOSE_HOUR = 10, 20                                   # 10 AM - 8 PM
 SLOT_TIMES = [f"{h:02d}:00" for h in range(OPEN_HOUR, CLOSE_HOUR)]  # 10:00 ... 19:00
-SLOT_CAPACITY = 1             # 2 physiotherapists, is liye ek slot mein 2 bookings
+SLOT_CAPACITY = 2              # 2 physiotherapists, is liye ek slot mein 2 bookings
 BOOKING_DAYS_AHEAD = 30        # zyada se zyada 30 din aage tak booking
 MAX_BOOKINGS_PER_SESSION = 2   # spam se bachao
 
@@ -333,8 +333,9 @@ Booking an appointment:
 2. Call check_availability with the date AND the user's phone number, then offer the free slots.
    - If check_availability says this number already has a booking on that day, tell the user exactly that and suggest another day. Do NOT ask them to confirm a new booking for that day.
 3. Before booking, repeat all the details back and ask the user to confirm (for example: "Kya main ye booking kar doon?").
-4. Only after the user clearly says yes, call book_appointment.
-5. Share the Booking ID and tell them the clinic will call to confirm.
+4. Only after the user says yes, call book_appointment. Treat haan, han, ji, jee, g, yes, ok, theek hai and kar dein as yes. Never ask for confirmation twice.
+5. Share the Booking ID and say the booking request is saved and the clinic will call to confirm it.
+   - A new booking is Pending until the clinic calls. Never say "confirm hai", "confirmed" or "pakki hai" about a booking.
 Never say a booking is done unless book_appointment returned a Booking ID.
 
 Bookings already made in this chat (these are real and saved):
