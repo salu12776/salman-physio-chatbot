@@ -9,3 +9,4 @@ langchain_text_splitters
 langchain_classic
 langchain_groq
 transformers
+slowapi
