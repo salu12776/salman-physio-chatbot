@@ -78,7 +78,7 @@ PKT = ZoneInfo("Asia/Karachi")
 CLINIC_PHONE = "0325-9874794"
 OPEN_HOUR, CLOSE_HOUR = 10, 20                                   # 10 AM - 8 PM
 SLOT_TIMES = [f"{h:02d}:00" for h in range(OPEN_HOUR, CLOSE_HOUR)]  # 10:00 ... 19:00
-SLOT_CAPACITY = 2              # 2 physiotherapists, is liye ek slot mein 2 bookings
+SLOT_CAPACITY = 1             # 2 physiotherapists, is liye ek slot mein 2 bookings
 BOOKING_DAYS_AHEAD = 30        # zyada se zyada 30 din aage tak booking
 MAX_BOOKINGS_PER_SESSION = 2   # spam se bachao
 
@@ -127,6 +127,18 @@ def get_active_bookings(date_str: str) -> list[list[str]]:
         r for r in rows
         if len(r) >= 8 and r[4].strip() == date_str and r[7].strip().lower() != "cancelled"
     ]
+
+
+def has_booking_on(date_str: str, phone_clean: str) -> bool:
+    """Kya is number se is din pehle se koi (active) booking hai?"""
+    return any(r[2].strip() == phone_clean for r in get_active_bookings(date_str))
+
+
+EXISTING_BOOKING_MSG = (
+    "Is number se {day} ko pehle se ek booking mojood hai. Ek number se ek din mein "
+    "sirf ek booking ho sakti hai. Booking dekhne, badalne ya cancel karne ke liye "
+    "clinic ko " + CLINIC_PHONE + " par call karein. Chahein to koi aur din chun lein."
+)
 
 
 def validate_date(date_str: str):
@@ -199,18 +211,23 @@ def make_tools(session: dict):
         return "\n\n".join(doc.page_content for doc in docs)
 
     @tool
-    def check_availability(date: str) -> str:
+    def check_availability(date: str, phone: str = "") -> str:
         """Check free appointment slots on a date. `date` must be YYYY-MM-DD.
-        Always call this before booking."""
+        `phone`: the user's mobile number, if you already know it. Always pass it
+        when known, so an existing booking for this number is detected BEFORE
+        you ask the user to confirm. Always call this before booking."""
         d, error = validate_date(date)
         if error:
             return error
+        day = d.strftime("%A, %d %B %Y")
+        phone_clean = normalize_phone(phone) if phone else None
         try:
+            if phone_clean and has_booking_on(d.isoformat(), phone_clean):
+                return EXISTING_BOOKING_MSG.format(day=day)
             slots = get_free_slots(d)
         except Exception:
             logger.exception("Availability check failed")
             return f"Booking system abhi available nahi. Clinic ko {CLINIC_PHONE} par call karein."
-        day = d.strftime("%A, %d %B %Y")
         if not slots:
             return f"{day} ko koi slot khali nahi. Koi aur din try karein."
         labels = ", ".join(f"{slot_label(t)} ({t})" for t in slots)
@@ -249,9 +266,8 @@ def make_tools(session: dict):
             return "Ye time valid nahi. Pehle check_availability se khali slot dekhein."
 
         try:
-            day_bookings = get_active_bookings(d.isoformat())
-            if any(r[2].strip() == phone_clean for r in day_bookings):
-                return "Is number se is din pehle hi ek booking mojood hai."
+            if has_booking_on(d.isoformat(), phone_clean):
+                return EXISTING_BOOKING_MSG.format(day=d.strftime("%A, %d %B %Y"))
             if time not in get_free_slots(d):
                 return "Maazrat, ye slot abhi abhi bhar gaya. Koi aur time chunein."
 
@@ -314,7 +330,8 @@ Booking an appointment:
 1. Collect: full name, Pakistani mobile number, service, preferred date and time. Ask for missing details politely, one question per reply.
    - Never ask the user to type a date or time in any format (no YYYY-MM-DD, no 24-hour). Accept natural answers like "Monday", "kal", "4 baje", "shaam 5" and convert them yourself using the dates above.
    - Never repeat a question the user has already answered. Write only one short reply per turn.
-2. Call check_availability for the date and offer the free slots.
+2. Call check_availability with the date AND the user's phone number, then offer the free slots.
+   - If check_availability says this number already has a booking on that day, tell the user exactly that and suggest another day. Do NOT ask them to confirm a new booking for that day.
 3. Before booking, repeat all the details back and ask the user to confirm (for example: "Kya main ye booking kar doon?").
 4. Only after the user clearly says yes, call book_appointment.
 5. Share the Booking ID and tell them the clinic will call to confirm.
