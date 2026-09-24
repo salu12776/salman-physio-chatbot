@@ -1,25 +1,29 @@
 """
-Salman Physio Care - RAG Chatbot Backend
------------------------------------------
-Ye FastAPI server Colab notebook ka poora RAG pipeline (Qdrant + Cohere + Groq)
-production mein chalata hai, aur har website visitor ke liye alag memory rakhta hai.
+Salman Physio Care - Agentic RAG Chatbot Backend
+-------------------------------------------------
+Ye FastAPI server ek AI agent chalata hai jiske paas 3 tools hain:
+  1. search_clinic_info  -> Qdrant + Cohere RAG (fees, services, timings)
+  2. check_availability  -> Google Sheet se khali slots
+  3. book_appointment    -> Google Sheet mein nayi booking
 
 Local test: uvicorn main:app --reload
-Render par deploy hone ke baad, ye ek public URL deta hai jise widget call karega.
 
 Security features:
-- API keys sirf environment variables se (code mein kabhi nahi)
+- API keys aur Google credentials sirf Render environment / secret files mein
 - CORS sirf allowed website ke liye
 - Rate limiting: har user (IP) aur poore server ki had
-- Message length ki had
+- Message length ki had, har session mein max bookings ki had
+- Sheet mein RAW likhna (formula injection se bachao)
 - Error details user ko nahi, sirf Render logs mein
-- Medical safety guardrails prompt mein
+- Medical safety guardrails system prompt mein
 """
 
 import os
+import re
 import uuid
 import logging
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,19 +33,18 @@ from pydantic import BaseModel, Field
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 
+import gspread
 from langchain_cohere import CohereEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from langchain.chat_models import init_chat_model
-from langchain_classic.memory import ConversationSummaryBufferMemory
-from langchain_classic.chains import ConversationalRetrievalChain
-from langchain_core.prompts import PromptTemplate
+from langchain.agents import create_agent
+from langchain_core.tools import tool
 
-# Errors Render ke "Logs" tab mein nazar aayenge
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("physio-chatbot")
 
 # ---------------------------------------------------------------------------
-# 1. Environment variables (Render ke "Environment" tab mein set karni hain)
+# 1. Environment variables
 # ---------------------------------------------------------------------------
 COHERE_API_KEY = os.environ.get("COHERE_API_KEY", "").strip()
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
@@ -49,8 +52,10 @@ QDRANT_URL = os.environ.get("QDRANT_URL", "").strip()
 QDRANT_API_KEY = os.environ.get("QDRANT_API_KEY", "").strip()
 COLLECTION_NAME = os.environ.get("QDRANT_COLLECTION", "salman_physio_docs")
 
-# Default ab "*" nahi, balke sirf GitHub Pages domain hai.
-# Env var na bhi ho to backend safe rahega.
+# Google Sheet (Render: SHEET_ID env var + Secret File google-credentials.json)
+SHEET_ID = os.environ.get("SHEET_ID", "").strip()
+GOOGLE_CREDS_FILE = os.environ.get("GOOGLE_CREDENTIALS_FILE", "/etc/secrets/google-credentials.json")
+
 ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get("ALLOWED_ORIGINS", "https://salu12776.github.io").split(",")
@@ -67,96 +72,279 @@ os.environ["COHERE_API_KEY"] = COHERE_API_KEY
 os.environ["GROQ_API_KEY"] = GROQ_API_KEY
 
 # ---------------------------------------------------------------------------
-# 2. Ek dafa startup par: embeddings, vectorstore, aur LLM shuru karna
+# 2. Clinic ke booking rules
+# ---------------------------------------------------------------------------
+PKT = ZoneInfo("Asia/Karachi")
+CLINIC_PHONE = "0325-9874794"
+OPEN_HOUR, CLOSE_HOUR = 10, 20                                   # 10 AM - 8 PM
+SLOT_TIMES = [f"{h:02d}:00" for h in range(OPEN_HOUR, CLOSE_HOUR)]  # 10:00 ... 19:00
+SLOT_CAPACITY = 2              # 2 physiotherapists, is liye ek slot mein 2 bookings
+BOOKING_DAYS_AHEAD = 30        # zyada se zyada 30 din aage tak booking
+MAX_BOOKINGS_PER_SESSION = 2   # spam se bachao
+
+SERVICES = {
+    "Back Pain Treatment": ["back", "kamar"],
+    "Sports Injury Treatment": ["sport", "ligament", "strain"],
+    "Post-Surgery Rehabilitation": ["surgery", "rehab", "operation"],
+    "Neck & Shoulder Pain": ["neck", "shoulder", "gardan", "kandha"],
+}
+
+# ---------------------------------------------------------------------------
+# 3. RAG + LLM (startup par ek dafa)
 # ---------------------------------------------------------------------------
 embeddings = CohereEmbeddings(model="embed-english-v3.0")
-
 vectorstore = QdrantVectorStore.from_existing_collection(
     embedding=embeddings,
     collection_name=COLLECTION_NAME,
     url=QDRANT_URL,
     api_key=QDRANT_API_KEY,
 )
-
-llm = init_chat_model("groq:openai/gpt-oss-120b", temperature=0.3, max_tokens=500)
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-
-# Prompt: sirf context se jawab, Roman Urdu/English, aur medical safety
-CUSTOM_PROMPT = PromptTemplate(
-    template="""You are a helpful assistant for Salman Physio Care, a physiotherapy clinic.
-Answer the question using only the context below.
-Always reply in Roman Urdu or English, written in the Latin/English alphabet only.
-Never use Devanagari, Arabic, or any other script.
-Do not use markdown formatting. Never use ** or * or # symbols.
-Write in plain text only. For lists, start each item on a new line with a dash (-).
-If you don't know the answer from the context, say so honestly and suggest calling the clinic at 0325-9874794.
-
-Medical safety rules (always follow these):
-- Never diagnose any condition and never suggest or name medicines.
-- Only share general information about the clinic's services, fees, timings and booking.
-- If the user mentions severe or sudden pain, chest pain, numbness, weakness in arms or legs,
-  loss of bladder or bowel control, a recent accident or fall, or a high fever, tell them to
-  see a doctor or go to the emergency department immediately, before anything else.
-- For any specific health concern, encourage them to book an assessment with the physiotherapist.
-
-Context: {context}
-
-Question: {question}
-
-Answer:""",
-    input_variables=["context", "question"],
-)
+llm = init_chat_model("groq:openai/gpt-oss-120b", temperature=0.2, max_tokens=1000)
 
 # ---------------------------------------------------------------------------
-# 3. Har user (session) ki apni alag memory + chain
-# NOTE: Memory server ki RAM mein hai; restart par purani sessions chali jayengi.
+# 4. Google Sheet helpers
+# Sheet columns: Booking ID | Name | Phone | Service | Date | Time | Created At | Status
+# ---------------------------------------------------------------------------
+_worksheet = None
+
+
+def get_worksheet():
+    """Sheet se connection sirf pehli zaroorat par banta hai."""
+    global _worksheet
+    if _worksheet is None:
+        if not SHEET_ID or not os.path.exists(GOOGLE_CREDS_FILE):
+            raise RuntimeError("Booking sheet configure nahi hai (SHEET_ID ya credentials file missing).")
+        client = gspread.service_account(filename=GOOGLE_CREDS_FILE)
+        _worksheet = client.open_by_key(SHEET_ID).sheet1
+    return _worksheet
+
+
+def get_active_bookings(date_str: str) -> list[list[str]]:
+    """Ek din ki sari bookings jo cancel nahi hui."""
+    rows = get_worksheet().get_all_values()[1:]  # pehli row headings hai
+    return [
+        r for r in rows
+        if len(r) >= 8 and r[4].strip() == date_str and r[7].strip().lower() != "cancelled"
+    ]
+
+
+def validate_date(date_str: str):
+    """Date check karta hai. Returns (date, None) ya (None, error message)."""
+    try:
+        d = datetime.strptime(date_str.strip(), "%Y-%m-%d").date()
+    except ValueError:
+        return None, "Date ka format YYYY-MM-DD hona chahiye, jaise 2026-09-28."
+    today = datetime.now(PKT).date()
+    if d < today:
+        return None, "Ye date guzar chuki hai. Aaj ya aane wali koi date chunein."
+    if d > today + timedelta(days=BOOKING_DAYS_AHEAD):
+        return None, f"Sirf agle {BOOKING_DAYS_AHEAD} din tak ki booking ho sakti hai."
+    if d.weekday() == 6:
+        return None, "Sunday ko clinic band hota hai. Monday se Saturday mein koi din chunein."
+    return d, None
+
+
+def get_free_slots(d) -> list[str]:
+    counts: dict[str, int] = {}
+    for row in get_active_bookings(d.isoformat()):
+        counts[row[5].strip()] = counts.get(row[5].strip(), 0) + 1
+
+    now = datetime.now(PKT)
+    free = []
+    for t in SLOT_TIMES:
+        if counts.get(t, 0) >= SLOT_CAPACITY:
+            continue
+        if d == now.date() and int(t[:2]) <= now.hour:  # aaj ke guzre hue slots
+            continue
+        free.append(t)
+    return free
+
+
+def match_service(text: str) -> str | None:
+    text = text.strip().lower()
+    for name, keywords in SERVICES.items():
+        if text == name.lower() or any(k in text for k in keywords):
+            return name
+    return None
+
+
+def normalize_phone(phone: str) -> str | None:
+    digits = re.sub(r"[^\d+]", "", phone)
+    if digits.startswith("+92"):
+        digits = "0" + digits[3:]
+    elif digits.startswith("92") and len(digits) == 12:
+        digits = "0" + digits[2:]
+    return digits if re.fullmatch(r"03\d{9}", digits) else None
+
+
+def slot_label(t: str) -> str:
+    """'15:00' -> '3:00 PM'"""
+    return datetime.strptime(t, "%H:%M").strftime("%I:%M %p").lstrip("0")
+
+
+# ---------------------------------------------------------------------------
+# 5. Agent ke tools (har session ke liye banaye jate hain)
+# ---------------------------------------------------------------------------
+def make_tools(session: dict):
+
+    @tool
+    def search_clinic_info(query: str) -> str:
+        """Search the clinic's knowledge base for services, fees, packages, timings,
+        staff, home visits, payment and cancellation policy. Use this for ANY
+        question about the clinic instead of answering from memory."""
+        docs = retriever.invoke(query)
+        if not docs:
+            return "Clinic ki maloomat mein is bare mein kuch nahi mila."
+        return "\n\n".join(doc.page_content for doc in docs)
+
+    @tool
+    def check_availability(date: str) -> str:
+        """Check free appointment slots on a date. `date` must be YYYY-MM-DD.
+        Always call this before booking."""
+        d, error = validate_date(date)
+        if error:
+            return error
+        try:
+            slots = get_free_slots(d)
+        except Exception:
+            logger.exception("Availability check failed")
+            return f"Booking system abhi available nahi. Clinic ko {CLINIC_PHONE} par call karein."
+        day = d.strftime("%A, %d %B %Y")
+        if not slots:
+            return f"{day} ko koi slot khali nahi. Koi aur din try karein."
+        labels = ", ".join(f"{slot_label(t)} ({t})" for t in slots)
+        return f"{day} ko ye slots khali hain: {labels}"
+
+    @tool
+    def book_appointment(name: str, phone: str, service: str, date: str, time: str) -> str:
+        """Book an appointment. ONLY call this after the user has explicitly confirmed
+        all the details. `phone`: Pakistani mobile number like 03001234567.
+        `service`: one of Back Pain Treatment, Sports Injury Treatment,
+        Post-Surgery Rehabilitation, Neck & Shoulder Pain.
+        `date`: YYYY-MM-DD. `time`: HH:MM in 24-hour format, from check_availability."""
+        if session["bookings"] >= MAX_BOOKINGS_PER_SESSION:
+            return f"Is chat se zyada bookings nahi ho sakti. Mazeed booking ke liye {CLINIC_PHONE} par call karein."
+
+        name = name.strip()
+        if not (2 <= len(name) <= 60):
+            return "Meharbani karke apna sahi naam batayein."
+
+        phone_clean = normalize_phone(phone)
+        if not phone_clean:
+            return "Phone number sahi nahi. Pakistani mobile number dein, jaise 03001234567."
+
+        service_name = match_service(service)
+        if not service_name:
+            return "Service samajh nahi aayi. Options: " + ", ".join(SERVICES)
+
+        d, error = validate_date(date)
+        if error:
+            return error
+
+        time = time.strip()
+        if len(time) == 4:  # "9:00" jaisa ho to "09:00"
+            time = "0" + time
+        if time not in SLOT_TIMES:
+            return "Ye time valid nahi. Pehle check_availability se khali slot dekhein."
+
+        try:
+            day_bookings = get_active_bookings(d.isoformat())
+            if any(r[2].strip() == phone_clean for r in day_bookings):
+                return "Is number se is din pehle hi ek booking mojood hai."
+            if time not in get_free_slots(d):
+                return "Maazrat, ye slot abhi abhi bhar gaya. Koi aur time chunein."
+
+            booking_id = f"SPC-{uuid.uuid4().hex[:6].upper()}"
+            created = datetime.now(PKT).strftime("%Y-%m-%d %H:%M")
+            get_worksheet().append_row(
+                [booking_id, name, phone_clean, service_name, d.isoformat(), time, created, "Pending"],
+                value_input_option="RAW",  # user ka text formula ban kar na chale
+            )
+        except Exception:
+            logger.exception("Booking failed")
+            return f"Booking system mein masla aaya. Clinic ko {CLINIC_PHONE} par call karein."
+
+        session["bookings"] += 1
+        note = ""
+        if service_name == "Post-Surgery Rehabilitation":
+            note = " Is service ke liye doctor ka referral saath layein."
+        return (
+            f"Booking save ho gayi. Booking ID: {booking_id}. {name}, {service_name}, "
+            f"{d.strftime('%A, %d %B %Y')} ko {slot_label(time)}. Status: Pending. "
+            f"Clinic call karke confirm karega.{note}"
+        )
+
+    return [search_clinic_info, check_availability, book_appointment]
+
+
+# ---------------------------------------------------------------------------
+# 6. System prompt (har request par aaj ki date ke saath)
+# ---------------------------------------------------------------------------
+def build_system_prompt() -> str:
+    now = datetime.now(PKT)
+    next_days = "\n".join(
+        f"- {(now + timedelta(days=i)).strftime('%A')}: {(now + timedelta(days=i)).strftime('%Y-%m-%d')}"
+        for i in range(0, 8)
+    )
+    return f"""You are the assistant for Salman Physio Care, a physiotherapy clinic in Pakistan.
+
+Current date and time (Pakistan): {now.strftime('%A, %Y-%m-%d, %I:%M %p')}
+Upcoming dates, use these to convert words like aaj, kal, parson, or weekday names:
+{next_days}
+
+Language and style:
+- Always reply in Roman Urdu or English, written in the Latin/English alphabet only. Never use Devanagari, Arabic, or any other script.
+- Do not use markdown formatting. Never use ** or * or # symbols. Write in plain text only.
+- For lists, start each item on a new line with a dash (-).
+- Keep replies short and friendly.
+
+Clinic information:
+- For any question about services, fees, packages, timings, staff or policies, call search_clinic_info. Never invent fees or services.
+- If the tool has no answer, say so honestly and suggest calling {CLINIC_PHONE}.
+
+Booking an appointment:
+1. Collect: full name, Pakistani mobile number, service, preferred date and time. Ask for missing details politely, one or two at a time.
+2. Call check_availability for the date and offer the free slots.
+3. Before booking, repeat all the details back and ask the user to confirm (for example: "Kya main ye booking kar doon?").
+4. Only after the user clearly says yes, call book_appointment.
+5. Share the Booking ID and tell them the clinic will call to confirm.
+Never say a booking is done unless book_appointment returned a Booking ID.
+
+Medical safety rules (always follow these first):
+- Never diagnose any condition and never suggest or name medicines.
+- If the user mentions severe or sudden pain, chest pain, numbness, weakness in arms or legs, loss of bladder or bowel control, a recent accident or fall, or a high fever, tell them to see a doctor or go to the emergency department immediately, before anything else.
+- For specific health concerns, encourage an assessment with the physiotherapist.
+"""
+
+
+# ---------------------------------------------------------------------------
+# 7. Sessions (har visitor ki chat history RAM mein)
 # ---------------------------------------------------------------------------
 sessions: dict[str, dict] = {}
 SESSION_TIMEOUT = timedelta(hours=2)
-MAX_SESSIONS = 300  # RAM bhar jane se bachane ke liye had
+MAX_SESSIONS = 300
+MAX_HISTORY = 12  # LLM ko sirf aakhri 12 messages bheje jate hain (token bachat)
 
 
-def get_or_create_session(session_id: str) -> ConversationalRetrievalChain:
-    """Har session_id ke liye alag memory wali chain deta hai."""
+def get_or_create_session(session_id: str) -> dict:
     now = datetime.now(timezone.utc)
-
-    # Purani, khatam ho chuki sessions saaf karna
-    expired = [sid for sid, data in sessions.items() if now - data["last_used"] > SESSION_TIMEOUT]
+    expired = [sid for sid, s in sessions.items() if now - s["last_used"] > SESSION_TIMEOUT]
     for sid in expired:
         del sessions[sid]
 
     if session_id not in sessions:
-        # Had poori ho to sab se purani session hata dein
         if len(sessions) >= MAX_SESSIONS:
             oldest = min(sessions, key=lambda sid: sessions[sid]["last_used"])
             del sessions[oldest]
-
-        memory = ConversationSummaryBufferMemory(
-            llm=llm,
-            memory_key="chat_history",
-            max_token_limit=1000,
-            return_messages=True,
-            output_key="answer",
-        )
-        chain = ConversationalRetrievalChain.from_llm(
-            llm=llm,
-            retriever=retriever,
-            memory=memory,
-            return_source_documents=True,
-            output_key="answer",
-            combine_docs_chain_kwargs={"prompt": CUSTOM_PROMPT},
-        )
-        sessions[session_id] = {"chain": chain, "last_used": now}
+        sessions[session_id] = {"history": [], "bookings": 0, "last_used": now}
     else:
         sessions[session_id]["last_used"] = now
-
-    return sessions[session_id]["chain"]
+    return sessions[session_id]
 
 
 # ---------------------------------------------------------------------------
-# 4. Rate limiting
-# Render ek proxy ke peeche chalta hai, is liye asal user ka IP
-# "X-Forwarded-For" header se lete hain.
+# 8. Rate limiting
 # ---------------------------------------------------------------------------
 def get_client_ip(request: Request) -> str:
     forwarded = request.headers.get("x-forwarded-for")
@@ -166,14 +354,13 @@ def get_client_ip(request: Request) -> str:
 
 
 def global_key(request: Request) -> str:
-    """Poore server ke liye ek hi counter (API credits bachane ke liye)."""
     return "global"
 
 
 limiter = Limiter(key_func=get_client_ip)
 
 # ---------------------------------------------------------------------------
-# 5. FastAPI app
+# 9. FastAPI app
 # ---------------------------------------------------------------------------
 app = FastAPI(title="Salman Physio Care Chatbot API")
 app.state.limiter = limiter
@@ -185,7 +372,7 @@ def rate_limit_handler(request: Request, exc: RateLimitExceeded):
         status_code=429,
         content={
             "detail": "Aap ne bohat zyada messages bhej diye hain. "
-                      "Thori der baad dobara try karein, ya clinic ko 0325-9874794 par call karein."
+                      f"Thori der baad dobara try karein, ya clinic ko {CLINIC_PHONE} par call karein."
         },
     )
 
@@ -209,39 +396,59 @@ class ChatResponse(BaseModel):
     session_id: str
 
 
+def extract_text(content) -> str:
+    """LLM ka jawab kabhi string, kabhi list of parts hota hai."""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return "".join(p.get("text", "") if isinstance(p, dict) else str(p) for p in content)
+    return str(content)
+
+
 @app.get("/")
 def health_check():
-    """Render aur UptimeRobot isay check karte hain ke server zinda hai. Is par limit nahi."""
     return {"status": "ok", "service": "Salman Physio Care Chatbot"}
 
 
 @app.post("/chat", response_model=ChatResponse)
-@limiter.limit("15/minute")                            # har user: 15 messages per minute
-@limiter.limit("100/day")                              # har user: 100 messages per din
-@limiter.limit("500/hour", key_func=global_key)        # poora server: 500 messages per ghanta
+@limiter.limit("15/minute")
+@limiter.limit("100/day")
+@limiter.limit("500/hour", key_func=global_key)
 def chat(request: Request, req: ChatRequest):
-    if not req.message.strip():
+    message = req.message.strip()
+    if not message:
         raise HTTPException(status_code=400, detail="Message khali nahi ho sakta.")
 
     session_id = req.session_id or str(uuid.uuid4())
-    chain = get_or_create_session(session_id)
+    session = get_or_create_session(session_id)
 
     try:
-        result = chain.invoke({"question": req.message.strip()})
+        agent = create_agent(
+            model=llm,
+            tools=make_tools(session),
+            system_prompt=build_system_prompt(),
+        )
+        messages = session["history"][-MAX_HISTORY:] + [{"role": "user", "content": message}]
+        result = agent.invoke({"messages": messages}, config={"recursion_limit": 12})
+        answer = extract_text(result["messages"][-1].content).strip()
+        if not answer:
+            answer = f"Maazrat, jawab nahi ban saka. Clinic ko {CLINIC_PHONE} par call karein."
     except Exception:
-        # Poori error sirf Render logs mein, user ko aam sa message
-        logger.exception("Chat chain failed for session %s", session_id)
+        logger.exception("Agent failed for session %s", session_id)
         raise HTTPException(
             status_code=500,
-            detail="Maazrat, abhi masla hai. Thori der baad try karein ya clinic ko 0325-9874794 par call karein.",
+            detail=f"Maazrat, abhi masla hai. Thori der baad try karein ya clinic ko {CLINIC_PHONE} par call karein.",
         )
 
-    return ChatResponse(answer=result["answer"], session_id=session_id)
+    session["history"].extend([
+        {"role": "user", "content": message},
+        {"role": "assistant", "content": answer},
+    ])
+    return ChatResponse(answer=answer, session_id=session_id)
 
 
 @app.post("/chat/reset")
 @limiter.limit("10/minute")
 def reset_session(request: Request, session_id: str):
-    """User naya conversation shuru karna chahe to memory clear karna."""
     sessions.pop(session_id, None)
     return {"status": "reset", "session_id": session_id}
