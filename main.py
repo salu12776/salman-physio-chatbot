@@ -405,7 +405,7 @@ def extract_text(content) -> str:
     return str(content)
 
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def health_check():
     return {"status": "ok", "service": "Salman Physio Care Chatbot"}
 
