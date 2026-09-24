@@ -220,7 +220,12 @@ def make_tools(session: dict):
         if error:
             return error
         day = d.strftime("%A, %d %B %Y")
-        phone_clean = normalize_phone(phone) if phone else None
+        phone_clean = None
+        if phone.strip():
+            phone_clean = normalize_phone(phone)
+            if not phone_clean:
+                return ("Ye phone number sahi nahi. Pakistani mobile number 11 digits ka hota hai "
+                        "aur 03 se shuru hota hai, jaise 03001234567. User se sahi number poochein.")
         try:
             if phone_clean and has_booking_on(d.isoformat(), phone_clean):
                 return EXISTING_BOOKING_MSG.format(day=day)
@@ -283,7 +288,8 @@ def make_tools(session: dict):
 
         session["bookings"] += 1
         session["booking_list"].append(
-            f"{booking_id}: {name}, {service_name}, {d.strftime('%A, %d %B %Y')} at {slot_label(time)}"
+            f"{booking_id}: {name} (phone {phone_clean}), {service_name}, "
+            f"{d.strftime('%A, %d %B %Y')} at {slot_label(time)}"
         )
         note = ""
         if service_name == "Post-Surgery Rehabilitation":
@@ -330,6 +336,8 @@ Booking an appointment:
 1. Collect: full name, Pakistani mobile number, service, preferred date and time. Ask for missing details politely, one question per reply.
    - Never ask the user to type a date or time in any format (no YYYY-MM-DD, no 24-hour). Accept natural answers like "Monday", "kal", "4 baje", "shaam 5" and convert them yourself using the dates above.
    - Never repeat a question the user has already answered. Write only one short reply per turn.
+   - A Pakistani mobile number has exactly 11 digits and starts with 03 (like 03001234567). If the number is shorter, longer or starts differently, politely ask for the correct number before anything else.
+   - Never write a reply and then call a tool. Call the tools first, then write one single final reply.
 2. Call check_availability with the date AND the user's phone number, then offer the free slots.
    - If check_availability says this number already has a booking on that day, tell the user exactly that and suggest another day. Do NOT ask them to confirm a new booking for that day.
 3. Before booking, repeat all the details back and ask the user to confirm (for example: "Kya main ye booking kar doon?").
@@ -341,6 +349,8 @@ Never say a booking is done unless book_appointment returned a Booking ID.
 Bookings already made in this chat (these are real and saved):
 {booked}
 - Never tell the user a booking was not made if it appears in this list.
+- Each booking belongs only to the phone number written next to it. Mention a booking from this list ONLY if the user's phone number is exactly the same. For a different number or name, treat it as someone else's booking: never mention it, its Booking ID or its details.
+- If a time slot is full, just say that time is not available and offer the free slots. Never say the user already has a booking unless check_availability or book_appointment said so for their own number.
 - After a booking, if the user says "nahi", "no", "bas" or "shukriya", it means they need nothing else. Say goodbye politely. It does NOT cancel the booking.
 - If the user wants to cancel or change a booking, ask them to call {CLINIC_PHONE} with their Booking ID.
 
