@@ -100,7 +100,9 @@ vectorstore = QdrantVectorStore.from_existing_collection(
     api_key=QDRANT_API_KEY,
 )
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-llm = init_chat_model("groq:openai/gpt-oss-120b", temperature=0.2, max_tokens=1000)# ---------------------------------------------------------------------------
+llm = init_chat_model("groq:openai/gpt-oss-120b", temperature=0.2, max_tokens=1000)
+
+# ---------------------------------------------------------------------------
 # 4. Google Sheet helpers
 # Sheet columns: Booking ID | Name | Phone | Service | Date | Time | Created At | Status
 # ---------------------------------------------------------------------------
@@ -264,6 +266,9 @@ def make_tools(session: dict):
             return f"Booking system mein masla aaya. Clinic ko {CLINIC_PHONE} par call karein."
 
         session["bookings"] += 1
+        session["booking_list"].append(
+            f"{booking_id}: {name}, {service_name}, {d.strftime('%A, %d %B %Y')} at {slot_label(time)}"
+        )
         note = ""
         if service_name == "Post-Surgery Rehabilitation":
             note = " Is service ke liye doctor ka referral saath layein."
@@ -279,8 +284,12 @@ def make_tools(session: dict):
 # ---------------------------------------------------------------------------
 # 6. System prompt (har request par aaj ki date ke saath)
 # ---------------------------------------------------------------------------
-def build_system_prompt() -> str:
+def build_system_prompt(session: dict) -> str:
     now = datetime.now(PKT)
+    if session["booking_list"]:
+        booked = "\n".join(f"- {b}" for b in session["booking_list"])
+    else:
+        booked = "- None yet"
     next_days = "\n".join(
         f"- {(now + timedelta(days=i)).strftime('%A')}: {(now + timedelta(days=i)).strftime('%Y-%m-%d')}"
         for i in range(0, 8)
@@ -311,6 +320,12 @@ Booking an appointment:
 5. Share the Booking ID and tell them the clinic will call to confirm.
 Never say a booking is done unless book_appointment returned a Booking ID.
 
+Bookings already made in this chat (these are real and saved):
+{booked}
+- Never tell the user a booking was not made if it appears in this list.
+- After a booking, if the user says "nahi", "no", "bas" or "shukriya", it means they need nothing else. Say goodbye politely. It does NOT cancel the booking.
+- If the user wants to cancel or change a booking, ask them to call {CLINIC_PHONE} with their Booking ID.
+
 Medical safety rules (always follow these first):
 - Never diagnose any condition and never suggest or name medicines.
 - If the user mentions severe or sudden pain, chest pain, numbness, weakness in arms or legs, loss of bladder or bowel control, a recent accident or fall, or a high fever, tell them to see a doctor or go to the emergency department immediately, before anything else.
@@ -337,7 +352,7 @@ def get_or_create_session(session_id: str) -> dict:
         if len(sessions) >= MAX_SESSIONS:
             oldest = min(sessions, key=lambda sid: sessions[sid]["last_used"])
             del sessions[oldest]
-        sessions[session_id] = {"history": [], "bookings": 0, "last_used": now}
+        sessions[session_id] = {"history": [], "bookings": 0, "booking_list": [], "last_used": now}
     else:
         sessions[session_id]["last_used"] = now
     return sessions[session_id]
@@ -426,7 +441,7 @@ def chat(request: Request, req: ChatRequest):
         agent = create_agent(
             model=llm,
             tools=make_tools(session),
-            system_prompt=build_system_prompt(),
+            system_prompt=build_system_prompt(session),
         )
         messages = session["history"][-MAX_HISTORY:] + [{"role": "user", "content": message}]
         result = agent.invoke({"messages": messages}, config={"recursion_limit": 12})
