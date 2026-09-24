@@ -100,8 +100,7 @@ vectorstore = QdrantVectorStore.from_existing_collection(
     api_key=QDRANT_API_KEY,
 )
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-llm = init_chat_model("groq:llama-3.3-70b-versatile", temperature=0.2, max_tokens=1000)
-# ---------------------------------------------------------------------------
+llm = init_chat_model("groq:openai/gpt-oss-120b", temperature=0.2, max_tokens=1000)# ---------------------------------------------------------------------------
 # 4. Google Sheet helpers
 # Sheet columns: Booking ID | Name | Phone | Service | Date | Time | Created At | Status
 # ---------------------------------------------------------------------------
