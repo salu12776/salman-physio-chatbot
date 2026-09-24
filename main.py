@@ -87,6 +87,8 @@ CUSTOM_PROMPT = PromptTemplate(
 Answer the question using only the context below.
 Always reply in Roman Urdu or English, written in the Latin/English alphabet only.
 Never use Devanagari, Arabic, or any other script.
+Do not use markdown formatting. Never use ** or * or # symbols.
+Write in plain text only. For lists, start each item on a new line with a dash (-).
 If you don't know the answer from the context, say so honestly and suggest calling the clinic at 0325-9874794.
 
 Medical safety rules (always follow these):
