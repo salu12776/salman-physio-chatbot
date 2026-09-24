@@ -100,8 +100,7 @@ vectorstore = QdrantVectorStore.from_existing_collection(
     api_key=QDRANT_API_KEY,
 )
 retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-llm = init_chat_model("groq:openai/gpt-oss-120b", temperature=0.2, max_tokens=1000)
-
+llm = init_chat_model("groq:llama-3.3-70b-versatile", temperature=0.2, max_tokens=1000)
 # ---------------------------------------------------------------------------
 # 4. Google Sheet helpers
 # Sheet columns: Booking ID | Name | Phone | Service | Date | Time | Created At | Status
@@ -304,7 +303,9 @@ Clinic information:
 - If the tool has no answer, say so honestly and suggest calling {CLINIC_PHONE}.
 
 Booking an appointment:
-1. Collect: full name, Pakistani mobile number, service, preferred date and time. Ask for missing details politely, one or two at a time.
+1. Collect: full name, Pakistani mobile number, service, preferred date and time. Ask for missing details politely, one question per reply.
+   - Never ask the user to type a date or time in any format (no YYYY-MM-DD, no 24-hour). Accept natural answers like "Monday", "kal", "4 baje", "shaam 5" and convert them yourself using the dates above.
+   - Never repeat a question the user has already answered. Write only one short reply per turn.
 2. Call check_availability for the date and offer the free slots.
 3. Before booking, repeat all the details back and ask the user to confirm (for example: "Kya main ye booking kar doon?").
 4. Only after the user clearly says yes, call book_appointment.
